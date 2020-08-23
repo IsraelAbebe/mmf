@@ -14,6 +14,10 @@ from mmf.utils.general import get_optimizer_parameters
 from omegaconf import OmegaConf
 
 
+from torch.utils.data.sampler import SubsetRandomSampler,WeightedRandomSampler
+import numpy as np
+
+
 ProcessorType = Type[Processor]
 ProcessorDict = Dict[str, ProcessorType]
 
@@ -130,6 +134,7 @@ def build_dataloader_and_sampler(
         mmf_typings.DataLoaderAndSampler: Tuple of Dataloader and Sampler instance
     """
     from mmf.common.batch_collator import BatchCollator
+    
 
     num_workers = training_config.num_workers
     pin_memory = training_config.pin_memory
@@ -143,6 +148,7 @@ def build_dataloader_and_sampler(
     # to the codebase
     if not isinstance(dataset_instance, torch.utils.data.IterableDataset):
         other_args = _add_extra_args_for_dataloader(dataset_instance, other_args)
+    print(str(other_args))
 
     loader = torch.utils.data.DataLoader(
         dataset=dataset_instance,
@@ -173,9 +179,12 @@ def _add_extra_args_for_dataloader(
         other_args = {}
     dataset_type = dataset_instance.dataset_type
 
-    other_args["shuffle"] = False
     if dataset_type != "test":
         other_args["shuffle"] = True
+    else:
+        other_args["shuffle"] = False
+        other_args["sampler"] = WeightedRandomSampler(torch.from_numpy(np.array([1,1.7])), get_batch_size())
+        other_args.pop("shuffle")
 
     # In distributed mode, we use DistributedSampler from PyTorch
     if is_dist_initialized():
@@ -185,7 +194,8 @@ def _add_extra_args_for_dataloader(
         # Shuffle is mutually exclusive with sampler, let DistributedSampler
         # take care of shuffle and pop from main args
         other_args.pop("shuffle")
-
+    
+    
     other_args["batch_size"] = get_batch_size()
 
     return other_args

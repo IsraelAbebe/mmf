@@ -846,7 +846,7 @@ class ROC_AUC(BaseMetric):
         output = torch.nn.functional.softmax(model_output["scores"], dim=-1)
         expected = sample_list["targets"]
         expected = _convert_to_one_hot(expected, output)
-        value = roc_auc_score(expected.cpu(), output.cpu(), **self._sk_kwargs)
+        value = roc_auc_score(expected.cpu(), output.cpu())
         return expected.new_tensor(value, dtype=torch.float)
 
 
