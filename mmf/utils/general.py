@@ -232,6 +232,12 @@ def get_batch_size():
 
     return batch_size // world_size
 
+def get_class_weight():
+    from mmf.utils.configuration import get_global_config
+
+    class_weight = get_global_config("training.class_weight")
+    return class_weight 
+
 
 def print_model_parameters(model, return_only=False):
     total_params = sum(p.numel() for p in model.parameters())
@@ -277,12 +283,3 @@ def log_device_names():
     if torch.cuda.is_available():
         device_name = torch.cuda.get_device_name()
         logger.info(f"CUDA Device {get_rank()} is: {device_name}")
-
-
-def assert_iterator_finished(iter):
-    try:
-        _ = next(iter)
-    except StopIteration:
-        pass
-    else:
-        assert False

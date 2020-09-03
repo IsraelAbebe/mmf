@@ -174,7 +174,7 @@ def _add_extra_args_for_dataloader(
     dataset_instance: mmf_typings.DatasetType,
     other_args: mmf_typings.DataLoaderArgsType = None,
 ) -> mmf_typings.DataLoaderArgsType:
-    from mmf.utils.general import get_batch_size
+    from mmf.utils.general import get_batch_size,get_class_weight
 
     if other_args is None:
         other_args = {}
@@ -184,7 +184,11 @@ def _add_extra_args_for_dataloader(
         other_args["shuffle"] = True
     else:
         other_args["shuffle"] = False
+<<<<<<< HEAD
         other_args["sampler"] = WeightedRandomSampler(torch.from_numpy(np.array([1,2])), get_batch_size())
+=======
+        other_args["sampler"] = WeightedRandomSampler(torch.from_numpy(np.array(get_class_weight())), get_batch_size())
+>>>>>>> new
         other_args.pop("shuffle")
 
     # In distributed mode, we use DistributedSampler from PyTorch
@@ -198,7 +202,6 @@ def _add_extra_args_for_dataloader(
     
     
     other_args["batch_size"] = get_batch_size()
-
     return other_args
 
 

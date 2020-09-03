@@ -3,6 +3,8 @@ config_version: 1.0
 
 # Configuration for training
 training:
+    #class weight
+    class_weight: [1,1]
     # Name of the trainer class used to define the training/evalution loop
     trainer: mmf
     # Seed to be used for training. -1 means random seed between 1 and 100000.
