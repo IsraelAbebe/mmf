@@ -184,11 +184,7 @@ def _add_extra_args_for_dataloader(
         other_args["shuffle"] = True
     else:
         other_args["shuffle"] = False
-<<<<<<< HEAD
-        other_args["sampler"] = WeightedRandomSampler(torch.from_numpy(np.array([1,2])), get_batch_size())
-=======
         other_args["sampler"] = WeightedRandomSampler(torch.from_numpy(np.array(get_class_weight())), get_batch_size())
->>>>>>> new
         other_args.pop("shuffle")
 
     # In distributed mode, we use DistributedSampler from PyTorch
