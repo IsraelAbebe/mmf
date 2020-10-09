@@ -13,6 +13,9 @@ from mmf.utils.distributed import is_dist_initialized
 from mmf.utils.general import get_optimizer_parameters
 from omegaconf import OmegaConf
 
+import torch
+from torchvision import transforms
+
 
 from torch.utils.data.sampler import SubsetRandomSampler,WeightedRandomSampler
 import numpy as np
@@ -148,8 +151,23 @@ def build_dataloader_and_sampler(
     # to the codebase
     if not isinstance(dataset_instance, torch.utils.data.IterableDataset):
         other_args = _add_extra_args_for_dataloader(dataset_instance, other_args)
-    print(str(other_args))
-
+    
+    if str(dataset_instance.dataset_type) == 'train':
+        train_transform = transforms.Compose([transforms.RandomRotation(30),
+                                          transforms.RandomHorizontalFlip(),
+                                          transforms.RandomVerticalFlip(), 
+                                          transforms.ToTensor()])
+        
+        dataset_instance.transform = train_transform
+        
+        print('With Augmented')
+        
+    else:
+        dataset_instance.transform = None
+        
+        print('With out Augmentation ')
+    
+    
     loader = torch.utils.data.DataLoader(
         dataset=dataset_instance,
         pin_memory=pin_memory,
