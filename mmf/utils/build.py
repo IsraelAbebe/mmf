@@ -154,9 +154,11 @@ def build_dataloader_and_sampler(
     
     if str(dataset_instance.dataset_type) == 'train':
         train_transform = transforms.Compose([transforms.RandomRotation(30),
-                                          transforms.RandomHorizontalFlip(),
-                                          transforms.RandomVerticalFlip(), 
-                                          transforms.ToTensor()])
+                                              transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
+                                              transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
+                                              transforms.Grayscale(num_output_channels=3),
+                                              transforms.RandomHorizontalFlip(),
+                                              transforms.ToTensor()])
         
         dataset_instance.transform = train_transform
         
@@ -166,6 +168,8 @@ def build_dataloader_and_sampler(
         dataset_instance.transform = None
         
         print('With out Augmentation ')
+        
+    print(str(dataset_instance.transform))
     
     
     loader = torch.utils.data.DataLoader(
